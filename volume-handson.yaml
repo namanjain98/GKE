@@ -1,0 +1,119 @@
+#First create a claim volume
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: 
+  name: mysql-volumeclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+
+
+# Mysql deployment file
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels: 
+    app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - image: mysql:5.6
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql
+              key: password
+          ports:  
+          - containerPort: 3306
+            name: mysql
+          volumeMounts:
+          - name: mysql-persistent-storage
+            mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-persistent-sorage
+          persistentVolumeClaim:
+            claimName: myql-volumeclaim
+
+#Mysql service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  type: clusterIP
+  ports:
+    - port: 3306
+  selector:
+    app: mysql
+
+#For wordpress create a persistentvolumeclaim
+
+
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: 
+  name: wordpress-volumeclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+
+#wordpress deployment file
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  labels: 
+    app: wordpress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+      - image: wordpress
+        name: wordpress
+        env:
+        - name: WORDPRESS_DB_HOST
+          value: mysql:3306
+        - name: WORDPRESS_DB_PASSWORD
+          valueFrom:
+            secretRef:
+              name: mysql
+              key: password
+        ports:  
+         - containerPort: 80
+            name: wordpress
+          volumeMounts:
+          - name: wordpress-persistent-storage
+            mountPath: /var/www/html
+      volumes:
+        - name: mysql-persistent-sorage
+          persistentVolumeClaim:
+            claimName: wordpress-volumeclaim
+# kubectl create secret generic mysql --from-literal=password=MYSECRETPASS

@@ -1,0 +1,60 @@
+#lieness probe 
+#check http endpoint ,tcp socket or any speific command to see if pods are healthy 
+#runs on each pod
+apiVersion: v1
+kind: Pod
+metadata:
+  name: liveness-pod
+spec:
+  containers:
+  - name: liveness-pod
+    image: nginx
+    args:
+    - /server
+    livenessProbe:
+      httpGet:
+        path: /abc
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeonds: 3
+#Rediness probes
+#if pod takes longer to get in
+#use both with pods together
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: liveness-pod
+spec:
+  containers:
+  - name: liveness-pod
+    image: nginx
+    ports:
+    - containerPort: 8080
+    redinessProbe:
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 30
+    livenessProbe:
+        httpGet:
+          path: /abc
+          port: 8080
+        initialDelaySeconds: 5
+        periodSeonds: 3
+
+#if liveness probe fails than kubernetes considers it in failed state
+
+#Rediness probe allow kubernetes to know when your app is ready to serve traffic,kubernetes will make sure that rediness
+#probe passes before sending traffic to it
+#if rediness probe fails kubernetes stops sending traffic to it until it pases agein
+
+#Liveness probe allow kubernetes to know if your pod is alive or dead, if it is dead kubernetes will remove the pod and
+# start a new one
+
+
+
+#Three type of probes for checking
+#Http:- most common , kubernetes will ping the path if it is successfull than rediness probe passed
+#command:- kubernetes will run a command inside the container if it passes than rediness probe passed
+#tcp :- if kubernetes can establish a tcp connection with the pod or container than rediness probe passed

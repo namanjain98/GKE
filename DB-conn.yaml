@@ -1,0 +1,53 @@
+#Create a cluster with 3 nodes
+#Enable SQL and SQL admin API
+#Create a SQL instance ( name:timtestdb)
+#create a DB in cloud SQL instance(name: myapp)(create user: myapp, password: password)
+#create a deployent and service file with the docker images
+#create a service account to grant pods to access mysql database
+#   command:- gcloud iam service-accounts create cloudsqlproxy
+#             gcloud projects add-iam-policy-binding project-name --member serviceAccount:cloudsqlproxy@project-name.iam.gserviceaccount.com --role roles/cloudsql.client
+#create a key to connect to it
+#   gcloud iam service-accounts key create ./sqlproxy.json --iam-account cloudsqlproxy@project-name.iam.gserviceaccount.com
+#copy the instance connection name from testdb database
+#Add the sidecar by adding container to the yaml file
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployemnt
+  labels:
+    app: myapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: gcr.io/tim-acloud-guru/myapp:blue
+        ports:
+        - containerPort: 8888
+      
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.11
+        command: ["/cloud-sql-proxy","-instances-tim-acloud-guru:us-central1:timtestdb=tcp:3306",
+                  "--credentials-file=/secrets/cloudsql/credentials.json"]
+        securityContext:
+          runAsUser: 2
+          allowPriviledgeEscalation: false
+        volumeMounts:
+          - name: cloudsql-instance-credentials
+            mountPath: /secrets/cloudsql
+            readOnly: true
+        volumes:
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
+
+#kubectl create secret generic cloudsql-instance-credentials --from-file=credentials.json=./sqlproxy.json 

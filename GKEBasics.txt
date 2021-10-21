@@ -1,0 +1,21 @@
+GKE provisions and manages the underlying cloud resources automatically
+
+Kubernetes is collection of computers joined together to perform same task
+Master:-
+        provide the controlplane
+    APIServer
+    ETCD
+    Scheduler
+    Cloud controller manager(networking and load balancing)
+    kube controller manager
+Node:-
+        Provide runtime env
+    Kubelet (agent for kubernetes)
+    kube-proxy(responsibe for managing network connecton in and out of node)
+    container-runtime
+ Interacting with GKE:
+    Google cloud console
+    command line
+    kubectl
+    Create and manage lifcycle of kubernetes objects
+    Communicate with API server

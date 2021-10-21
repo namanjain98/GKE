@@ -1,0 +1,6 @@
+to create a static ip for load balancer in us-central1 region
+gcloud compute addresses create helloweb-us-central1-ip --region us-central1
+
+1) generate the installation manifest for ingress controller
+
+controller:

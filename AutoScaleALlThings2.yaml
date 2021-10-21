@@ -1,0 +1,42 @@
+#Add a horizontalpod autoscaler
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+  labels:
+    app: myapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: gcr.io/tim-acloudguru
+        ports:  
+        - containerPort: 8888
+        resources:
+          requests:
+            cpu: 200m 
+
+
+#my-app-hpa.yaml
+apiVersion: v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: myapp-hpa
+spec:
+  maxReplicas: 30
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: myapp-deployment
+  targetCPUUtilizationPercentage: 60
+
+

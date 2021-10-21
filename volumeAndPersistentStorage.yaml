@@ -1,0 +1,92 @@
+#data volume and persist volume after the lifetime of pod or container
+#container storage is ephemeral
+#A volume is independent object
+#A dir is mounted to the container to access files
+#Many different types- some of which are persistent(lifecycle is managed seperately from deployments)
+#Types:
+#1) emptydir: - a managed space that can be shared by multiple containers in the same pod, deleted when pod is removed from node
+#2)gcePersistentDisk:- must be created beforehand, specific to gcp, pre-populated with data, mounted read only by 
+#   muktiple users,just unmounted when pod is deleted
+#3)PersistentVolumeClaim:- USed to mount persistent volume to the pod, a way to claim durable storage
+
+#Persistent volume
+#persistent volume defined the piece of storage in the cluster
+#PersistentVolumeCaim is req to conasume the PersistentVolume
+#Access mode define how volue is accesd by multiple users
+
+#define a persistent volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: myapp-pv
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 10G
+  accessModes:
+    - ReadOnlyMany
+  gcePersistentDisk:
+    pdName: myapp-disk
+    fsType: ext4
+
+#Now we have 10G of persistent volume avialable in our cluster
+
+#claim the volume
+
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: 
+  name: myapp-vol
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 10G 
+
+
+#We can claim he volume without creating it at all, kbecnetes will create it automatically
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: 
+  name: myapp-dynamic
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi
+
+
+
+#consume the volume claim when defining volumes in a pod spec
+
+volumes:
+- name: myapp-vol
+  persistentVolumeClaim:
+    claimName: myapp-dynamic
+    readOnly: true
+
+
+#GKE default storage class is standard persistet disk
+# We can change he disk type
+
+
+
+apiVersion: storage.k8s.io/v1
+Kind: StorageClass
+metadata:
+  name: gce-ssd
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-ssd
+  replication-type: none
+
+
+
+#AccessModes
+#ReadWriteOnce:-  a single node can mount the volume read/write
+#ReadOnlyMany
+#ReadWriteMany (not supported by persistent disk in gcp)

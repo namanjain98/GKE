@@ -1,0 +1,28 @@
+#A more customizable way to route traffic
+#AN ingress object configures the access to the service from outside the cluster
+#Designed for http and https 
+#can provice ssl and name-based and path-based routing
+#Set up ingress controller
+#Routes traffic based on service based on ingress definations
+#usually fronted by cloud load balancer
+#Consolidates your routing through single resource
+#nginx ingress controller deployment is very commmon
+#other ingress controller are avialable 
+#with the help of ingress controller we will not requires different loadbalancer for different services 
+
+
+# users---------------->load balancer--------------------->ingress controller------->service -----> pods
+#                                                                |
+#                                                                |-------------->service------>pods  
+
+#ingress resource:
+# host: mydoman.com,path:/app service:mainapp
+#host: mydomain.com,path:/secure service:secureapp
+#host:mydomain.org,path:/rewrite rules
+#nginx ingress cotroller
+  #Runs as a deployment or daemonset
+  #supports autoscaling
+  #supported by kubernetes project
+
+
+

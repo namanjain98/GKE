@@ -1,0 +1,48 @@
+#Called as kubernetes package manager
+#packages kubernetes object manifest and configuration oin helm chart
+#Maintains the lifecycle of deployment to GKE
+#PUblic reps of helm chart 
+
+#Using Helm:
+#instal helm tool
+#searh for software in Artifact hub
+#install helm chart
+  #helm install my-wordpress bitnami/wordpress
+  #helm applies the templated manifest from the chart to the cluster
+
+Directory structure:
+
+wordpress/
+  chart.yaml
+  LICENCE
+  README.md
+  values.yaml
+  values.schema.json
+  templates/
+
+chart.yaml:- chart metadata,it includes author and sources as well as dependencies, master file of chart
+values.yaml:- Customizable config specific to deployment such as image versions,resource req and ingress options
+values.schema.json:- it defines the schema for values.yaml
+template:- all kubernetes manifest file written in go template
+
+commands for elastic-search:
+
+helm repo add elastic https://helm.elastic.co
+helm install my-elasticsearch elastic/elasticsearch --version 7.15.0
+kubectl get pods --namespace=default -l app=elasticsearch-master -w
+kubetl get statefulsets
+kubectl get services
+kubectl get pv
+helm status 
+helm upgrade --set replicas=2 my-ealsticsearch elastic/elasticsearch
+helm list
+helm delete my-elasticsearch
+kubectl delete pvc pv-name
+change the value in values.yaml
+helm get manifest my-elasticsearch(name of release )
+
+
+
+
+
+

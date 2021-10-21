@@ -1,0 +1,77 @@
+#Horizontally scale the pods if the demand is high
+  #HorizontalPodAutoscaler
+#Verticle scale the pod ito increase the resource req
+  #VerticalPodAutoscaler
+#scale cluster nodes
+  #in GKE this is called as Node-pool aotuscaling 
+#Do not use the Horizontal Pod Autoscaler together with the Vertical Pod Autoscaler on CPU or memory. You can use the Horizontal Pod Autoscaler with the Vertical Pod Autoscaler for other metrics.
+
+
+apiVersion: v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx
+  minReplicas: 3
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 60
+
+#VerticlePod autoscaler
+#Vertical Pod autoscaling supports a maximum of 500 VerticalPodAutoscaler objects per cluster.
+#iN this there is changes made to the pod so it will restart the pod
+apiVersion: v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: myapp-vpa
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: myapp-deployment
+  updatePolicy:
+    updateMode: "auto"
+
+#Cluster autoscaling
+#Works best with node pools
+#Node group gropus the vm of specific type together eg: high cpu,high RAM
+#Best practices:
+#Design node pools around specific workloads
+#Enable cluster autoscaling and horizontal pod autoscaling 
+#Ex:
+#Run CI/CD on single fixed node
+#Web frontend workload on generic autoscaling node pool
+#RAM intensive on high RAM -intensive nodes
+
+
+
+#In helm 
+
+apiVersion:  autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    namespace: {{ .Values.app.namespace }}
+    getlatka: {{ .Values.app.name }}
+    group: {{ .Values.app.group }}
+  name: {{ .Values.app.name }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.app.name }}
+  minReplicas: {{ .Values.app.container.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.app.container.autoscaling.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .Values.app.container.autoscaling.CPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .Values.app.container.autoscaling.MemoryUtilizationPercentage }}
+

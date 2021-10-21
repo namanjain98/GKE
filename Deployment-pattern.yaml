@@ -1,0 +1,29 @@
+#Types of updates:
+#Rollig update
+  #Gradually replace the pods with updated spec
+  #Control how many additional pods can be created
+  #Threshold for failed pods
+  #Default update stratgy
+#Canary deployments
+  #Test 
+  #Combines multiple deployment with single service
+  #Deploy updates to small set of pods in other deployment
+#Blue green deployments
+  #Two coplete deployment
+  #Swith traffic from blue to greem
+  #can swith to previous version if req
+  #can be done by selector only
+
+  
+  
+#blue green deployment create a three version of images and store them on container registry
+#in canary deployment there can be a case where the second replica will be accessing the same volume as created by 
+#first for this we can use 
+spec:
+  replicas: 3
+  strategy:
+    type: Recreate
+  selector:
+    .......
+#Now the new pods will not be created untill the 1st gets shut down
+#So only one pod will access the volume in it. 

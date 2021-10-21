@@ -1,0 +1,80 @@
+Cluster basics:
+    Name: cluster-1
+Location type:
+    Zonal:- in a single zone
+    Regional:- Our nodes will be in different zones, so it is more likely to survive different zones crash
+    Master Version:- version of kubernetes we want to run on master
+
+Node pool:-
+They are seperate instance groups running kubernetes in a cluster
+We can add different node pools in different zone for higher AZ
+We can also add node pools of different machine types
+When we create node in gke they belong to pool
+Node of same type are always in the same pool
+We can have different node pool
+
+Default pool:-
+    machine type: g1-small
+
+Difference bw aaply and create
+Create:-  will create it for the first time
+Apply:- will delete it and create new again 
+
+Demo creating pods:-
+
+# three types: nodeport, clusterIP,loadbalancer
+#cluster IP:- Assign fixed ip address inside kubernetes cluster
+#               allows services to talk to each other internally as it cannot be accessed outside the cluster
+#NodePort:-   Assign specific port to a node in a cluster
+#Loadbalancer:- GKE/EKS will create a load balancer in your cloud provider
+  #             by default it will create GCP NLB in gcp to expose the service 
+#node port range 30000
+#Cluster IP service is created by default
+
+Service also provide built in DNS name which can be resolved by anything running inside kubernetes cluster
+
+
+IN features :
+    enable cloud operations for GKE
+
+we can also view the monitoring dashboards of diferent pods,nodes,cluster etc
+
+
+Monitoring and logging:-
+
+kubectl create deployment nginx --image nginx
+kubectl get deployments
+kubectl get pods
+kubectl get events
+kubectl describe deployment
+    (we can view the same under workloads in GKE section)
+kubectl describe pod name-of-pod
+kubectl expose deployment nginx --port=80 --type=LoadBalancer
+kubectl get services
+kubectl get pods
+kubectl log pod/pod-name
+kubectl logs --selector app=nginx
+    (we can also look this logs in workloads under manage deployments and see container logs)
+also look for cloud monitoring dashboards
+    (we can enable monitoring dashboards in GCP)
+in a single node cluster    
+    kubectl scale --replicas=10 deployment nginx
+    all pods will not come in running state
+    we need to look for the pods
+    kubectl describe pod pod-name
+    if we create a deployment with the image that does not exist than to there is a problem
+        Back-off pulling image(deploy an image that does not exist)
+        kuectl logs pod/badluck-2-anbc(see logs of the pod)
+
+
+A service automatically gets an internal domain name by itself
+
+
+
+Pod reliability with health checks:-
+Liveness probes:
+Check a HTP endpoint, TCP socket or a run command
+
+
+To build and push docker image drectly fom one command
+gcloud builds submit --tag gcr.io/tim-acloud-guru/myapp:v1
